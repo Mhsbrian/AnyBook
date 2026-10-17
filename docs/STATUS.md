@@ -2,7 +2,7 @@
 
 ## Now (2026-10-16, night)
 
-The repo is **https://github.com/Mhsbrian/OpenBook**; the old AnyBook URL (`github.com/Mhsbrian/AnyBook`) redirects. PRs #1–#26 are merged (#24: OpenBook naming in docs; #25: the high-fidelity installer design and G14 hardware-check stick; #26: ANAL-198 kernel packaging). Every PR was checked before merging (script syntax, Python compile, no binaries or secrets, sizes, evidence backs the claim), and doc conflicts were resolved by hand.
+The repo is **https://github.com/Mhsbrian/OpenBook**; the old AnyBook URL (`github.com/Mhsbrian/AnyBook`) redirects. PRs #1–#35 are merged (latest: #33 G14 run 4; #34 ANAL-190 live USB image; #35 ANAL-199 G14 product). Every PR was checked before merging (script syntax, Python compile, no binaries or secrets, sizes, evidence backs the claim), and doc conflicts were resolved by hand.
 
 **Decided by the owner**
 - **Keep the dGPU disabled for now** (2026-10-16, on ANAL-187):
@@ -18,10 +18,10 @@ The repo is **https://github.com/Mhsbrian/OpenBook**; the old AnyBook URL (`gith
 - **Digitalis upstream report** (ANAL-181/200): OK to report the Fennec, `MRS` and `FRECPE` findings to DigitalisX64? That is an outward-facing action.
 - **Device-in-the-loop** (ANAL-194): install the Multica daemon on the G14's current Linux when ready (`docs/PLAN.md` §4a).
 - **G14 hardware-check stick** (optional, owner): `scripts/installer/make-hwcheck-stick.sh` builds a USB image. It boots our kernel, drivers and firmware on the laptop, writes a report and the kernel log to the stick, and powers off without touching internal disks (`docs/installer.md` §2.7). Writing the stick needs you to name the exact USB device.
-- **Installer sign-off** (ANAL-189): approve the recommendation in `docs/installer.md` once it lands. ANAL-190 waits for it.
+- **Live USB on the G14** (ANAL-190): the live image is built and tested in QEMU. Its first G14 boot needs you to confirm the stick by `/dev/disk/by-id` (checklist: `docs/installer.md` §11.6).
 
 **Lanes on the dev host** (the 7950X has 61 GB RAM; an AOSP build peaks at about 41 GiB):
-- **AOSP lane**, one builder at a time in `~/anybook/aosp/src`: ✓ ANAL-174 (PR #23), then ▶ **ANAL-199**, the G14 product (promoted 2026-10-16 after #23 and #26). Next are ANAL-176 and ANAL-200. The VM product's device is now `anybook_vsoc_x86_64`, so boot it with `CF_DEVICE=anybook_vsoc_x86_64`.
+- **AOSP lane**, one builder at a time in `~/anybook/aosp/src`: ✓ ANAL-174 (PR #23), ✓ ANAL-199 (PR #35), then ▶ **ANAL-176**, the first OpenBook desktop on the G14 (promoted 2026-10-17). ANAL-200 follows when the lane frees up. The VM product's device is now `anybook_vsoc_x86_64`, so boot it with `CF_DEVICE=anybook_vsoc_x86_64`.
 - **Kernel lane:** ✓ ANAL-198 (PR #26). The G14 images and firmware are ready for ANAL-199, and the lane is free.
 - **Light lanes:** ✓ ANAL-189 (design and QEMU boot-chain prototype in PRs #22 and #25: high-fidelity wizard design, OpenBook naming, quiet boot, G14 hardware-check stick; awaiting sign-off) and ✓ ANAL-187 (research delivered; its dGPU-off default feeds ANAL-199 and ANAL-176).
 - **Hand-offs:** condition wakeups on ANAL-159 promote each next step as soon as its dependencies reach review with a merged PR.
@@ -34,8 +34,8 @@ The repo is **https://github.com/Mhsbrian/OpenBook**; the old AnyBook URL (`gith
 | ANAL-161 AMD GKI kernel (android17-6.18) | ✓ ANAL-170 stock GKI reproduced (PR #4) | ✓ ANAL-171 AMD config, 138 vendor modules (PR #8) | ✓ ANAL-172 our kernel boots our userspace (PR #12) | ✓ ANAL-198 bare-metal packaging: first-stage NVMe and USB boot, vendor_boot, dlkm images, firmware (PR #26) |
 | ANAL-162 AMD graphics userspace | ✓ ANAL-173 Mesa radeonsi/RADV for Android (PR #3) | ✓ ANAL-174 AMD graphics in the tree, boot-time HAL selection (PR #23) | ⏸ ANAL-177 dEQP/CTS on the G14 | — |
 | ANAL-164 ARM compat and native bridge | ✓ ANAL-180 harness and baseline (PR #6) | ✓ ANAL-181 Digitalis: GO with conditions (PR #11) | ⏳ ANAL-200 Digitalis on Android 17 as our bridge (after ANAL-199) | — |
-| ANAL-163 Bare metal on the G14 (GA403WR) | ✓ ANAL-175 inventory and full driver map (PRs #8, #16; the owner's root run is processed too: dGPU `10de:2f58`, panel ATNA40CU05-0, speaker tuning found) | ▶ ANAL-199 G14 product `anybook_g14_x86_64`: builds, USB GPT image, `boot_completed` in QEMU/OVMF (PR in review) | ⏳ ANAL-176 USB boot on the G14 (after ANAL-199) | ⏸ ANAL-178 input and power, ANAL-179 audio and Wi-Fi |
-| ANAL-188 USB installer (M8) | ✓ ANAL-189 design and boot-chain prototype (PR #22): systemd-boot recommended, GRUB fallback; **awaiting owner sign-off** | ⏸ ANAL-190 live USB image (needs sign-off) | ⏸ ANAL-191 wizard | ⏸ ANAL-192 end-to-end tests |
+| ANAL-163 Bare metal on the G14 (GA403WR) | ✓ ANAL-175 inventory and full driver map (PRs #8, #16; the owner's root run is processed too: dGPU `10de:2f58`, panel ATNA40CU05-0, speaker tuning found) | ✓ ANAL-199 G14 product `anybook_g14_x86_64`: USB GPT image, `boot_completed` in QEMU/OVMF, SELinux enforcing (PR #35) | ▶ ANAL-176 desktop on the G14 from USB. First live boot reached SurfaceFlinger with a touchpad pointer; fixing the RADV/ANGLE boot-animation crash and the denials | ⏸ ANAL-178 input and power, ANAL-179 audio and Wi-Fi |
+| ANAL-188 USB installer (M8) | ✓ ANAL-189 design and boot-chain prototype (PR #22): systemd-boot recommended, GRUB fallback; **awaiting owner sign-off** | ✓ ANAL-190 live USB image (PR #34): QEMU 38/39; booted on the G14 by the owner (`evidence/2026-10-16-installer/g14-live/`) | ⏸ ANAL-191 wizard | ⏸ ANAL-192 end-to-end tests |
 | **ANAL-193 Device-in-the-loop on the G14 (§4a)** | ⏸ ANAL-194 runtime and agent on G14 Linux (owner installs the daemon) | ⏸ ANAL-195 Zen 5 validation in KVM | ⏸ ANAL-196 dual-boot test cycle | ⏸ ANAL-197 runtime on installed OpenBook |
 | ANAL-186 NVIDIA dGPU | ✓ ANAL-187 research and dGPU-off default (`docs/nvidia.md`: off for M3–M8, N1–N6 after M4) | — | — | — |
 | ANAL-165 Track B: Googlebook OS on AMD | ⏸ ANAL-182, ANAL-183 | ⏸ ANAL-184 | ⏸ ANAL-185 | — |
@@ -43,8 +43,8 @@ The repo is **https://github.com/Mhsbrian/OpenBook**; the old AnyBook URL (`gith
 
 **Critical path to "OpenBook on the G14":**
 1. ✓ ANAL-174 (PR #23) and ANAL-198 (PR #26).
-2. ▶ ANAL-199: the G14 product, booting in QEMU.
-3. ANAL-176: USB boot on the laptop.
+2. ✓ ANAL-199 (PR #35): the G14 product, booting in QEMU. ✓ ANAL-190 (PR #34): the live USB image, first booted on the G14.
+3. ▶ ANAL-176: the desktop visible on the laptop. The owner runs the boot; there is no G14 runtime yet (ANAL-194).
 4. ANAL-178 and ANAL-179.
 5. The installer (ANAL-190 to ANAL-192).
 6. ANAL-197: the runtime on the device.
@@ -64,6 +64,16 @@ The repo is **https://github.com/Mhsbrian/OpenBook**; the old AnyBook URL (`gith
 **Found:** five hardware-independent blockers, all fixed: no `mount_all`, two missing service labels (Gatekeeper's shared secret, the minigbm mapper), the allocator's metadata memfds (including MLS for apps), and an audio policy without the modules the audio HAL declares. Also: AMD laptops get no TPM hwrng (`tpm_crb` quirk, also in the G14's own dmesg); `prng_seeder` gives up without blocking anyone.
 
 **Next:** ANAL-190 rebuilds the live stick from this product; the owner boots it on the G14 (ANAL-176). Details: `docs/g14-product.md`.
+
+### 2026-10-16: M8, live USB image (ANAL-190)
+- `scripts/installer-image.sh` builds the approved raw GPT live image from ANAL-199's G14 product: systemd-boot, slot A only, `super` re-packed from 8 GiB to 1.23 GiB, firmware licences from the vendor image. Output: 2.68 GiB image, 0.9 GB `.xz`, built in 41 s, byte-identical across rebuilds.
+- `openbook-live-init` (rdinit) grows `userdata` to fill the stick and moves the backup GPT on first boot, erases the live data on "start fresh", and on "save logs" writes dmesg, logcat, system facts, a screenshot and `summary.json` to the stick.
+- QEMU/OVMF matrix and owner checklist: `docs/installer.md` §11. Evidence: `evidence/2026-10-16-installer/live/`.
+- **Desktop not reached in QEMU** (product, ANAL-199): `system_server` is killed by its watchdog while it waits for the audio HAL.
+- **First live boot on the G14:**
+  - Working: USB boot, the 56 GiB live `/data` on the stick, amdgpu on the panel, SurfaceFlinger with a touchpad-driven pointer, keyboard, and the dGPU in D3cold.
+  - Black screen because the boot animation crashes in RADV (`AcquireNextImageKHR`), and the framework loops on audio.
+  - Evidence: `evidence/2026-10-16-installer/g14-live/`.
 
 ### 2026-10-16: Kernel, bare-metal packaging for the G14 (ANAL-198)
 
@@ -389,4 +399,37 @@ The repo is **https://github.com/Mhsbrian/OpenBook**; the old AnyBook URL (`gith
 - **An s2idle suspend/resume cycle works, but S0ix residency is 0.** The driverless dGPU stays D0/active (the `docs/nvidia.md` §1 prediction, now measured).
 - Battery health is 88.7 %, and `regulatory.db` now loads.
 - **Next:** v3 check stick, with a sleep test after powering the dGPU down for one boot (unbind, remove, root-port runtime PM), which tests `docs/nvidia.md` option 2 on hardware.
+- **Evidence:** `evidence/2026-10-16-g14-hwcheck/`.
+
+### 2026-10-16: G14 run 4: dGPU detached, still no S0i3 (ANAL-189)
+- Detaching the dGPU works (bridge to D3hot), but the SMU reports "Last S0i3 Status: Unknown/Fail", and the firmware re-enumerates the dGPU on resume.
+- So the dGPU is not the only blocker.
+- The eDP panel check is fixed (2880×1800).
+- **Next:**
+  - v4 stick with the kernel's sleep debugging;
+  - a Linux baseline with AMD's `amd-s2idle test` on the same laptop.
+- **Evidence:** `evidence/2026-10-16-g14-hwcheck/`.
+
+### 2026-10-16: G14 run 5: dGPU bridge in D3cold, still no S0i3; one LPI constraint unmet (ANAL-189)
+- With the kernel's sleep debugging on, the dGPU's bridge reaches D3cold, and the LPS0 entry/exit calls all succeed. The SMU still reports "Last S0i3 Status: Unknown/Fail".
+- **Only one LPI constraint is unmet: `\_SB_.PCI0.GPP0.SWUS`** (min D3hot, current D0). HYPOTHESIS: this is the child of the empty hotplug port `00:01.1`, which nothing powers down; it is not the dGPU (`GPP9`, per a sibling model's ACPI dump).
+- The dGPU returning on resume looks like the kernel powering the root port back up, not the firmware (corrects run 4).
+- **Next:**
+  - v5 stick (ACPI path per PCI device, ACPI power states and power resources around the sleep);
+  - the `amd-s2idle` Linux baseline, still the decisive comparison.
+- **Evidence:** `evidence/2026-10-16-g14-hwcheck/`.
+
+### 2026-10-16: G14 run 6: the unmet constraint is an ACPI object the kernel powered up and never powered down (ANAL-189)
+- `GPP0` = `00:01.1`, the empty hotplug port; the dGPU is `GPP9.PEGP` (`00:03.1`).
+- `GPP0.SWUS` has no device, but stays D0 with `GPP0.SWUS.PWRS` on from boot to after resume. PCI setup powers a bridge's `_ADR` children up for the scan (`acpi_dev_power_up_children_with_adr()`), and nothing powers an unused one down again (6.18 source).
+- **Next:** the v6 stick powers that object down before the sleep test, using a test-only module (QEMU-tested with a fixture that recreates the case).
+  - If S0i3 is reached, the real fix belongs in the kernel lane: power down `_ADR` children that no device claimed after the bus scan, or a G14 quirk.
+  - If not, the remaining suspects are the PSP without a driver (`65:00.2`) and the USB4 router.
+- **Evidence:** `evidence/2026-10-16-g14-hwcheck/`.
+
+### 2026-10-16: G14 run 7: GPP0.SWUS ruled out; S0i3 moves to ANAL-178 (ANAL-189)
+- The v6 module powered `GPP0.SWUS` down on the laptop, and every LPI constraint was met. The dGPU was off too. S0i3 still failed, with the same SMU idle mask as runs 5 and 6.
+- The OS-visible causes are exhausted: every managed PCI function is suspended, all LPI constraints are met, the LPS0 calls succeed, and the SMU gets the hint. What's left is below the OS (SMU/BIOS GA403WR.309), or a driver ACPI doesn't report: the PSP with no `ccp`/amd-pmf, or the USB4 router.
+- **Deciding test (owner):** `amd-s2idle test` on the laptop's own Linux. If it reaches S0i3, diff its drivers against ours; if not, it's the BIOS.
+- **Scope:** S0i3 affects standby battery drain only. It does not block live USB booting or installation. It continues in ANAL-178 with the hardware-check stick, the probe and the `acpi_d3cold` module.
 - **Evidence:** `evidence/2026-10-16-g14-hwcheck/`.
